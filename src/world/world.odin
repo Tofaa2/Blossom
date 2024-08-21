@@ -20,6 +20,7 @@ Chunk :: struct {
     x: i32,
     z: i32,
     world_pos: raylib.Matrix,
+    world_pos_vec: raylib.Vector3,
     blocks: [CHUNK_SIZE * CHUNK_SIZE * CHUNK_DEPTH]BlockType
 }
 
@@ -30,26 +31,38 @@ chunk_create_random :: proc(x: i32, z: i32) -> ^Chunk {
     chunk.x = x
     chunk.z = z
     chunk.world_pos = chunk_pos_to_mat(chunk)
+    chunk.world_pos_vec = raylib.Vector3 { f32(x * CHUNK_SIZE), 0, f32(z * CHUNK_SIZE) }
 
     for nx in 0..<CHUNK_SIZE {
         for nz in 0..<CHUNK_SIZE {
 
-            height := n.noise_2d(SEED, n.Vec2 {
-                f64(x * CHUNK_SIZE + nx) / 64.0,
-                f64(z * CHUNK_SIZE + nz) / 64.0
-            }) * f32(CHUNK_DEPTH / 2) + f32(CHUNK_DEPTH / 2)
-    
-
-            for y in 0..<CHUNK_DEPTH {
-                if (f32(y) < height ){
-                    chunk.blocks[chunk_get_block_index(nx, y, nz)] = .STONE
+            for ny in 0..<CHUNK_DEPTH {
+                height := n.noise_2d(SEED, n.Vec2 {
+                    f64(x * CHUNK_SIZE + nx) / 64.0,
+                    f64(z * CHUNK_SIZE + nz) / 64.0
+                }) * f32(CHUNK_DEPTH / 2) + f32(CHUNK_DEPTH / 2)
+                if (f32(ny) < height ){
+                    chunk.blocks[chunk_get_block_index(nx, ny, nz)] = .STONE
                 }
             }
+
+            // height := n.noise_2d(SEED, n.Vec2 {
+            //     f64(x * CHUNK_SIZE + nx) / 64.0,
+            //     f64(z * CHUNK_SIZE + nz) / 64.0
+            // }) * f32(CHUNK_DEPTH / 2) + f32(CHUNK_DEPTH / 2)
+    
+
+            // for y in 0..<CHUNK_DEPTH {
+            //     if (f32(y) < height ){
+            //         chunk.blocks[chunk_get_block_index(nx, y, nz)] = .STONE
+            //     }
+            // }
         }
     }
     
     return chunk
 }
+
 
 chunk_get_block_index :: proc(h: i32, v: i32, d: i32) -> i32 {
     return (d * (CHUNK_SIZE * CHUNK_SIZE)) + (v * CHUNK_SIZE) + h
