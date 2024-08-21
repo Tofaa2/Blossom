@@ -33,35 +33,24 @@ chunk_create_random :: proc(x: i32, z: i32) -> ^Chunk {
     chunk.world_pos = chunk_pos_to_mat(chunk)
     chunk.world_pos_vec = raylib.Vector3 { f32(x * CHUNK_SIZE), 0, f32(z * CHUNK_SIZE) }
 
-    frequency := 1.22
-
-    elevation : [CHUNK_SIZE][CHUNK_SIZE]f32
     for nx in 0..<CHUNK_SIZE {
         for nz in 0..<CHUNK_SIZE {
-            elevation[nx][nz] = n.noise_2d(SEED, n.Vec2 {
-                f64(x * CHUNK_SIZE + nx) * frequency,
-                f64(z * CHUNK_SIZE + nz) * frequency
-            })
-        }
-    }
 
 
-    for d in 0..<CHUNK_DEPTH {
-        for v in 0..<CHUNK_SIZE {
-            for h in 0..<CHUNK_SIZE {
-                if (f32(d + LOWEST_CHUNK_DEPTH)) < (elevation[h][v] * 64) {
-                    chunk.blocks[chunk_get_block_index(h, v, d)] = .AIR
-                } else if (f32(d + LOWEST_CHUNK_DEPTH)) == (elevation[h][v] * 64) {
-                    chunk.blocks[chunk_get_block_index(h, v, d)] = .GRASS
-                } else if (d + LOWEST_CHUNK_DEPTH) < 0 {
-                    chunk.blocks[chunk_get_block_index(h, v, d)] = .WATER
-                } else {
-                    chunk.blocks[chunk_get_block_index(h, v, d)] = .STONE
+            height := n.noise_2d(SEED, n.Vec2 {
+                f64(x * CHUNK_SIZE + nx) / 64.0,
+                f64(z * CHUNK_SIZE + nz) / 64.0
+            }) * f32(CHUNK_DEPTH / 2) + f32(CHUNK_DEPTH / 2)
+    
+
+            for y in 0..<CHUNK_DEPTH {
+                if (f32(y) < height ){
+                    chunk.blocks[chunk_get_block_index(nx, y, nz)] = .STONE
                 }
             }
         }
     }
-
+    
     return chunk
 }
 
