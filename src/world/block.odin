@@ -8,6 +8,7 @@ BlockType :: enum(u8) {
     GOLD = 4,
     STONE = 5,
     SAND = 6,
+    WATER = 7,
 }
 
 BlockFace :: enum {
