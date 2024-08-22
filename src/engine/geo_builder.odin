@@ -35,8 +35,8 @@ geo_mesh_chunk :: proc(chunk: ^world.Chunk) -> raylib.Mesh {
 	geo_allocate(&builder, world.chunk_get_face_count(chunk))
 
 	count: i32 = 0
-	for d in 0 ..< world.CHUNK_DEPTH {
-		for v in 0 ..< world.CHUNK_SIZE {
+	for d in 0 ..< world.CHUNK_SIZE {
+		for v in 0 ..< world.CHUNK_DEPTH {
 			for h in 0 ..< world.CHUNK_SIZE {
 				if !world.chunk_block_is_solid(chunk, h, v, d) {
 					continue
@@ -66,7 +66,7 @@ geo_mesh_chunk :: proc(chunk: ^world.Chunk) -> raylib.Mesh {
 				if (!world.chunk_block_is_solid(chunk, h, v, d - 1)) {
 					faces[world.BlockFace.DOWN] = true
 				}
-				vec := raylib.Vector3{f32(h), f32(d), f32(v)}
+				vec := raylib.Vector3{f32(h), f32(v), f32(d)}
 				geo_add_cube(
 					&builder,
 					&vec,
