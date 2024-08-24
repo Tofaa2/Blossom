@@ -86,6 +86,7 @@ geo_allocate :: proc(builder: ^CubeGeometryBuilder, triangles: i32) {
 	builder.mesh.vertexCount = triangles * 6
 	builder.mesh.triangleCount = triangles * 2
 
+
 	builder.mesh.vertices =
 	cast(^f32)(raylib.MemAlloc(u32(size_of(f32) * 3 * builder.mesh.vertexCount)))
 	builder.mesh.normals =

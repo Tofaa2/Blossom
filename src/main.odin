@@ -8,13 +8,53 @@ import "engine"
 import "ecs"
 import "core:time"
 import "core:mem"
+import "utils"
 
-GameState :: struct {
-	camera: raylib.Camera3D,
-	world: ^world.World,
-}
+FIXED_INTERVAL :: 60.0
+FIXED_INTERVAL_NS : f64 : 1_000_000_000 / FIXED_INTERVAL
 
 main :: proc() {
+	state := engine.GameState {}
+	state.settings = engine.settings_read()
+	state.request_exit = false
+	state.ecs_context = ecs.init_ecs()
+
+	state.scene = ecs.create_entity(&state.ecs_context)
+	ecs.add_component(&state.ecs_context, state.scene, engine.scene_main_menu(&state))
+	
+	state.world = ecs.create_entity(&state.ecs_context)
+	state.player = ecs.create_entity(&state.ecs_context)
+
+	engine.initialize(state.settings.screen)
+
+
+	draw_interval : f64 = 1000000000 / 60.0
+	last_time : f64 = f64(time.now()._nsec)
+	current_time : f64 = f64(time.now()._nsec)
+	delta : f64 = 0.0
+
+	for !state.request_exit {
+
+		current_time = f64(time.now()._nsec)
+		delta = (current_time - last_time) / draw_interval
+		last_time = current_time
+
+		if delta > 1.0 {
+			engine.tick(&state)
+			delta -= 1.0
+		}
+
+		engine.render(&state)
+		engine.process_input(&state)
+		free_all(context.temp_allocator)
+	}
+
+	engine.shutdown()
+}
+
+
+
+main_two :: proc() {
     using raylib
 
 	ctx := ecs.init_ecs();
@@ -65,11 +105,6 @@ main :: proc() {
 		}
 	}
 	for c in ecs.get_component(&ctx, world_entity, [dynamic]world.Chunk) {}
-
-	// game_world := new(world.World)
-	// game_world.chunks = make([dynamic]^world.Chunk, 0, 100)	
-	// meshes : [dynamic]Mesh = make([dynamic]Mesh, 0, 100)
-
 
     mat := LoadMaterialDefault()
     mat.maps[0].color = WHITE;
