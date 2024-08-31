@@ -54,7 +54,7 @@ main :: proc() {
 
 
 
-main_two :: proc() {
+main_ :: proc() {
     using raylib
 
 	ctx := ecs.init_ecs();

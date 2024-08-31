@@ -1,12 +1,14 @@
 package utils_logger
 
 import "core:fmt"
+import "core:log"
 import "core:time"
 import "vendor:raylib"
 import "core:c"
 import "core:strings"
 
 log :: proc(level: Level = .INFO, message: string) {
+    
     fmt.printf("[%d] %s\n", time.now(), message)
 }
 
